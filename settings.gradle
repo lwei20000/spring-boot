@@ -1,5 +1,9 @@
 pluginManagement {
 	repositories {
+
+		// 默认的包下载地址太慢，使用阿里的镜像
+		maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+
 		mavenCentral()
 		gradlePluginPortal()
 		maven {
@@ -67,6 +71,8 @@ include "spring-boot-project:spring-boot-devtools"
 include "spring-boot-project:spring-boot-docs"
 include "spring-boot-project:spring-boot-properties-migrator"
 include "spring-boot-project:spring-boot-test"
+include "spring-boot-project:test" // 添加测试子项目
+
 include "spring-boot-project:spring-boot-test-autoconfigure"
 include "spring-boot-tests:spring-boot-deployment-tests"
 include "spring-boot-tests:spring-boot-integration-tests:spring-boot-configuration-processor-tests"
