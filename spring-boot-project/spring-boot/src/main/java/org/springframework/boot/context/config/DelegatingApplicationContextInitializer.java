@@ -46,11 +46,14 @@ public class DelegatingApplicationContextInitializer
 
 	private static final String PROPERTY_NAME = "context.initializer.classes";
 
+	// DelegatingApplicationContextInitializer这个系统初始化器的order是0，也就是最高的优先级。
+	// 这就是为什么03号系统初始化器的使用方法时，排序会最靠前的原因。
 	private int order = 0;
 
 	@Override
 	public void initialize(ConfigurableApplicationContext context) {
 		ConfigurableEnvironment environment = context.getEnvironment();
+		// 系统初始化器
 		List<Class<?>> initializerClasses = getInitializerClasses(environment);
 		if (!initializerClasses.isEmpty()) {
 			applyInitializerClasses(context, initializerClasses);

@@ -152,10 +152,16 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		}
 	}
 
+	/**
+	 * spring-context中的AbstractApplicationContext中的refresh()中调用了onRefresh()
+	 * 而onRefresh()是一个空实现，具体实现就是由本子类进行实现。
+	 * onRefresh
+	 */
 	@Override
 	protected void onRefresh() {
 		super.onRefresh();
 		try {
+			// 构建web服务器
 			createWebServer();
 		}
 		catch (Throwable ex) {
@@ -175,10 +181,17 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		WebServer webServer = this.webServer;
 		ServletContext servletContext = getServletContext();
 		if (webServer == null && servletContext == null) {
+			//
 			StartupStep createWebServer = this.getApplicationStartup().start("spring.boot.webserver.create");
+
+			//
 			ServletWebServerFactory factory = getWebServerFactory();
 			createWebServer.tag("factory", factory.getClass().toString());
+
+			// 得到factory是TomcatServletWebServerFactory
+			// 启动tomcat
 			this.webServer = factory.getWebServer(getSelfInitializer());
+
 			createWebServer.end();
 			getBeanFactory().registerSingleton("webServerGracefulShutdown",
 					new WebServerGracefulShutdownLifecycle(this.webServer));
@@ -193,6 +206,8 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 				throw new ApplicationContextException("Cannot initialize servlet context", ex);
 			}
 		}
+
+		//
 		initPropertySources();
 	}
 
@@ -205,6 +220,9 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	protected ServletWebServerFactory getWebServerFactory() {
 		// Use bean names so that we don't consider the hierarchy
 		String[] beanNames = getBeanFactory().getBeanNamesForType(ServletWebServerFactory.class);
+
+		// web服务器个数等于0和大于1都出错，也就是说只能存在一个web服务器
+		// 本处返回的是tomcatServerWebServerFactory
 		if (beanNames.length == 0) {
 			throw new ApplicationContextException("Unable to start ServletWebServerApplicationContext due to missing "
 					+ "ServletWebServerFactory bean.");
@@ -213,6 +231,8 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 			throw new ApplicationContextException("Unable to start ServletWebServerApplicationContext due to multiple "
 					+ "ServletWebServerFactory beans : " + StringUtils.arrayToCommaDelimitedString(beanNames));
 		}
+
+		// 本处构建tomcatServerWebServerFactory的单例（进入了spring容器中）
 		return getBeanFactory().getBean(beanNames[0], ServletWebServerFactory.class);
 	}
 

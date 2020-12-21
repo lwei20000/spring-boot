@@ -279,9 +279,15 @@ public class SpringApplication {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+
+		// 1.11节：推断web容器的类型：reactive ｜ servlet ｜ none
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
+
 		this.bootstrappers = new ArrayList<>(getSpringFactoriesInstances(Bootstrapper.class));
+
+		// 1.3节：系统初始化器的设置入口
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
+
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
@@ -320,10 +326,18 @@ public class SpringApplication {
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
 			configureIgnoreBeanInfo(environment);
 			Banner printedBanner = printBanner(environment);
+
+			/**创建应用上下文**/
 			context = createApplicationContext();
+
 			context.setApplicationStartup(this.applicationStartup);
+
+			/**调用系统初始化器的入口**/
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
+
+			// refreshContext
 			refreshContext(context);
+
 			afterRefresh(context, applicationArguments);
 			stopWatch.stop();
 			if (this.logStartupInfo) {
@@ -387,7 +401,10 @@ public class SpringApplication {
 			ApplicationArguments applicationArguments, Banner printedBanner) {
 		context.setEnvironment(environment);
 		postProcessApplicationContext(context);
+
+		// 调用系统初始化器
 		applyInitializers(context);
+
 		listeners.contextPrepared(context);
 		bootstrapContext.close(context);
 		if (this.logStartupInfo) {
@@ -423,6 +440,8 @@ public class SpringApplication {
 				// Not allowed in some environments.
 			}
 		}
+
+		// refresh
 		refresh((ApplicationContext) context);
 	}
 
@@ -438,6 +457,7 @@ public class SpringApplication {
 				this.applicationStartup);
 	}
 
+	/**系统初始化器实例**/
 	private <T> Collection<T> getSpringFactoriesInstances(Class<T> type) {
 		return getSpringFactoriesInstances(type, new Class<?>[] {});
 	}
@@ -445,8 +465,11 @@ public class SpringApplication {
 	private <T> Collection<T> getSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes, Object... args) {
 		ClassLoader classLoader = getClassLoader();
 		// Use names and ensure unique to protect against duplicates
+		// 获得系统初始化器的全路径名
 		Set<String> names = new LinkedHashSet<>(SpringFactoriesLoader.loadFactoryNames(type, classLoader));
+		// 通过全路径名实例话系统初始化器
 		List<T> instances = createSpringFactoriesInstances(type, parameterTypes, classLoader, args, names);
+		// 排序
 		AnnotationAwareOrderComparator.sort(instances);
 		return instances;
 	}
@@ -594,6 +617,15 @@ public class SpringApplication {
 	 * @see #setApplicationContextFactory(ApplicationContextFactory)
 	 */
 	protected ConfigurableApplicationContext createApplicationContext() {
+		// private ApplicationContextFactory applicationContextFactory = ApplicationContextFactory.DEFAULT;
+		//      switch (webApplicationType) {
+		//			case SERVLET:
+		//				return new AnnotationConfigServletWebServerApplicationContext();
+		//			case REACTIVE:
+		//				return new AnnotationConfigReactiveWebServerApplicationContext();
+		//			default:
+		//				return new AnnotationConfigApplicationContext();
+		//			}
 		return this.applicationContextFactory.create(this.webApplicationType);
 	}
 
@@ -629,9 +661,12 @@ public class SpringApplication {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void applyInitializers(ConfigurableApplicationContext context) {
 		for (ApplicationContextInitializer initializer : getInitializers()) {
-			Class<?> requiredType = GenericTypeResolver.resolveTypeArgument(initializer.getClass(),
-					ApplicationContextInitializer.class);
+			Class<?> requiredType = GenericTypeResolver.resolveTypeArgument(initializer.getClass(), ApplicationContextInitializer.class);
+
+			// 判断是否是系统初始化器ApplicationContextInitializer的子类
 			Assert.isInstanceOf(requiredType, context, "Unable to call initializer.");
+
+			// 是ApplicationContextInitializer的子类的情况下调用initialize()方法
 			initializer.initialize(context);
 		}
 	}
