@@ -23,9 +23,9 @@ public class FirstInitializer implements ApplicationContextInitializer<Configura
 		ConfigurableEnvironment environment =  applicationContext.getEnvironment();
 		Map<String, Object> map = new HashMap<>();
 		map.put("key1", "value");
-		MapPropertySource mapPropertySource = new MapPropertySource("firstInitilizer", map);
+		MapPropertySource mapPropertySource = new MapPropertySource("firstInitilizer1", map);
 		environment.getPropertySources().addLast(mapPropertySource);
-		System.out.println("=====================> run firstInitializer");
+		System.out.println("=====================> run firstInitializer1");
 	}
 }
 
