@@ -288,7 +288,9 @@ public class SpringApplication {
 		// 1.3节：系统初始化器的设置入口
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
 
+		// 1.4节：监听器的注册（与系统初始化器类似）
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
@@ -323,8 +325,12 @@ public class SpringApplication {
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
 		try {
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
+
+			/**Environment解析**/
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
 			configureIgnoreBeanInfo(environment);
+
+			/**打印banner**/
 			Banner printedBanner = printBanner(environment);
 
 			/**创建应用上下文**/
@@ -595,13 +601,20 @@ public class SpringApplication {
 		}
 	}
 
+	/**
+	 * 打印banner
+	 * @param environment
+	 * @return
+	 */
 	private Banner printBanner(ConfigurableEnvironment environment) {
+		// 如果配置文件中配置了banner.node.off 就不打印banner
 		if (this.bannerMode == Banner.Mode.OFF) {
 			return null;
 		}
 		ResourceLoader resourceLoader = (this.resourceLoader != null) ? this.resourceLoader
 				: new DefaultResourceLoader(null);
 		SpringApplicationBannerPrinter bannerPrinter = new SpringApplicationBannerPrinter(resourceLoader, this.banner);
+		// 打印在控制台 ｜ 还是打印在日志里面
 		if (this.bannerMode == Mode.LOG) {
 			return bannerPrinter.print(environment, this.mainApplicationClass, logger);
 		}

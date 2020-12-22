@@ -1,4 +1,4 @@
-package event1;
+package event.event2;
 
 import initializer.initializer.SecondInitializer;
 import org.springframework.boot.SpringApplication;

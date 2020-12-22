@@ -62,12 +62,17 @@ public class ResourceBanner implements Banner {
 	@Override
 	public void printBanner(Environment environment, Class<?> sourceClass, PrintStream out) {
 		try {
+			// 取得文件banner的内容
 			String banner = StreamUtils.copyToString(this.resource.getInputStream(),
-					environment.getProperty("spring.banner.charset", Charset.class, StandardCharsets.UTF_8));
+					environment.getProperty("spring.banner.charset",
+							Charset.class,
+							StandardCharsets.UTF_8));
 
+			// 替换文件banner中的占位符
 			for (PropertyResolver resolver : getPropertyResolvers(environment, sourceClass)) {
 				banner = resolver.resolvePlaceholders(banner);
 			}
+			// 打印banner
 			out.println(banner);
 		}
 		catch (Exception ex) {

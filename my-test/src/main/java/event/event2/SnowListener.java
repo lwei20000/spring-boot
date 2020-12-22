@@ -1,4 +1,4 @@
-package event1;
+package event.event2;
 
 import org.springframework.stereotype.Component;
 
@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
  * @Description:
  */
 @Component
-public class RainListener implements WeatherListener {
+public class SnowListener implements WeatherListener {
 	@Override
 	public void onWeatherEvent(WeatherEvent event) {
-		if (event instanceof RainEvent) {
+		if (event instanceof SnowEvent) {
 			System.out.println("hello: " + event.getWeather());
 		}
 	}

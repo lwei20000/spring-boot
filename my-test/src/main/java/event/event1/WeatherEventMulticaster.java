@@ -1,13 +1,10 @@
-package event1;
-
-import org.springframework.stereotype.Component;
+package event.event1;
 
 /**
  * @Auther: weiliang
  * @Date: 2020/12/21 17:15
  * @Description:
  */
-@Component
 public class WeatherEventMulticaster extends AbstractEventMulticaster {
 	 void doStart() {
 		System.out.println("begin broadcast weather event");

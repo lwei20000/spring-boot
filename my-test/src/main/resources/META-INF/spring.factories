@@ -1,1 +1,3 @@
 org.springframework.context.ApplicationContextInitializer=initializer.initializer.FirstInitializer
+
+org.springframework.context.ApplicationListener=event.event3.FirstListener,event.event3.ThirdListener

@@ -76,6 +76,7 @@ public class ImageBanner implements Banner {
 		String headless = System.getProperty("java.awt.headless");
 		try {
 			System.setProperty("java.awt.headless", "true");
+			// 打印banner
 			printBanner(environment, out);
 		}
 		catch (Throwable ex) {
@@ -94,12 +95,16 @@ public class ImageBanner implements Banner {
 	}
 
 	private void printBanner(Environment environment, PrintStream out) throws IOException {
+		// 图片属性：长、宽、边距、旋转度
 		int width = getProperty(environment, "width", Integer.class, 76);
 		int height = getProperty(environment, "height", Integer.class, 0);
 		int margin = getProperty(environment, "margin", Integer.class, 2);
 		boolean invert = getProperty(environment, "invert", Boolean.class, false);
+
 		BitDepth bitDepth = getBitDepthProperty(environment);
 		PixelMode pixelMode = getPixelModeProperty(environment);
+
+		// readFrames是java中的图案输出方法。
 		Frame[] frames = readFrames(width, height);
 		for (int i = 0; i < frames.length; i++) {
 			if (i > 0) {

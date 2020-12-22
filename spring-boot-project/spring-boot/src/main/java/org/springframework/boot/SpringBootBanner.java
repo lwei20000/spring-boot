@@ -41,16 +41,19 @@ class SpringBootBanner implements Banner {
 
 	@Override
 	public void printBanner(Environment environment, Class<?> sourceClass, PrintStream printStream) {
+		// 依次打印SPRING的图案
 		for (String line : BANNER) {
 			printStream.println(line);
 		}
+		// 获取版本号
 		String version = SpringBootVersion.getVersion();
 		version = (version != null) ? " (v" + version + ")" : "";
+		// 填充空格
 		StringBuilder padding = new StringBuilder();
 		while (padding.length() < STRAP_LINE_SIZE - (version.length() + SPRING_BOOT.length())) {
 			padding.append(" ");
 		}
-
+		// 打印SPRING图像地下的springboot版本信息
 		printStream.println(AnsiOutput.toString(AnsiColor.GREEN, SPRING_BOOT, AnsiColor.DEFAULT, padding.toString(),
 				AnsiStyle.FAINT, version));
 		printStream.println();

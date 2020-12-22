@@ -1,4 +1,4 @@
-package event1;
+package event.event2;
 
 /**
  * @Auther: weiliang
