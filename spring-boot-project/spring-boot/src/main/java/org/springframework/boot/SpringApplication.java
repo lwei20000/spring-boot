@@ -321,18 +321,28 @@ public class SpringApplication {
 	 * @return a running {@link ApplicationContext}
 	 */
 	public ConfigurableApplicationContext run(String... args) {
+		// 开启计时器
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
+
+		//
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
 		ConfigurableApplicationContext context = null;
+
+		//
 		configureHeadlessProperty();
+
+		/**SpringApplicationRunListeners监听器**/// 获得SpringApplicationRunListener数组，该数组封装于SpringApplicationRunListeners的listeners数组中
 		SpringApplicationRunListeners listeners = getRunListeners(args);
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
+
 		try {
+			// 初始化ApplicationArguments
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
 
-			/**Environment解析**/
+			/**初始化ConfigurableEnvironment**/ // 如：application.properties中和外部的属性配置
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
+			// 忽略信息配置spring.beaninfo.ignore
 			configureIgnoreBeanInfo(environment);
 
 			/**打印banner**/
@@ -340,20 +350,26 @@ public class SpringApplication {
 
 			/**创建应用上下文**/
 			context = createApplicationContext();
-
 			context.setApplicationStartup(this.applicationStartup);
 
-			/**调用【系统初始化器】的入口**/
+			/**准备应用上下文**/
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
 
 			// refreshContext
 			refreshContext(context);
 
+			// 初始化之后，默认空实现
 			afterRefresh(context, applicationArguments);
+
+			// 停止计时
 			stopWatch.stop();
+
+			// 打印启动日志
 			if (this.logStartupInfo) {
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), stopWatch);
 			}
+
+			// 通知监听器，容器启动完成
 			listeners.started(context);
 
 			/**调用【启动加载器】的入口**/
@@ -364,6 +380,7 @@ public class SpringApplication {
 			throw new IllegalStateException(ex);
 		}
 
+		// 通知监听器，容器正在启动
 		try {
 			listeners.running(context);
 		}
@@ -382,18 +399,33 @@ public class SpringApplication {
 
 	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
 			DefaultBootstrapContext bootstrapContext, ApplicationArguments applicationArguments) {
+
 		// Create and configure the environment
+		// 获取或者创建环境
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
+
+		// 配置环境，主要包括PropertySources和activeProfiles的配置
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
+
+		// 将ConfigurationPropertySources附加到指定环境中的第一位，并动态跟踪环境的添加或删除
 		ConfigurationPropertySources.attach(environment);
+
+		// listener环境准备
 		listeners.environmentPrepared(bootstrapContext, environment);
+
 		DefaultPropertiesPropertySource.moveToEnd(environment);
 		configureAdditionalProfiles(environment);
+
+		// 将环境绑定到SpringApplication
 		bindToSpringApplication(environment);
+
+		// 判断是否定制环境，如果不是定制的则将环境转化为StandardEnviroment
 		if (!this.isCustomEnvironment) {
 			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment,
 					deduceEnvironmentClass());
 		}
+
+		// 将ConfigurationPropertySources附加到环境中的第一位，并动态跟踪环境的添加和删除
 		ConfigurationPropertySources.attach(environment);
 		return environment;
 	}
@@ -413,35 +445,59 @@ public class SpringApplication {
 			ConfigurableEnvironment environment, SpringApplicationRunListeners listeners,
 			ApplicationArguments applicationArguments, Banner printedBanner) {
 
+		// 设置上下文的配置环境
 		context.setEnvironment(environment);
+
+		// 应用上下文的后置处理器
 		postProcessApplicationContext(context);
 
-		// 调用系统初始化器
+		// 在context刷新之前，ApplicationContextInitializer初始化context。（调用系统初始化器）
 		applyInitializers(context);
 
+		// ========通知监听器context准备好，该方法以上是文准备阶段，一下为上下是加载阶段。=========
 		listeners.contextPrepared(context);
+
+		//
 		bootstrapContext.close(context);
+
+		// 打印日志，启动profile
 		if (this.logStartupInfo) {
 			logStartupInfo(context.getParent() == null);
 			logStartupProfileInfo(context);
 		}
+
+		// 获得ConfigurableListableBeanFactory并注册单例对象
 		// Add boot specific singleton beans
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+
+		// 注册springApplicationArguments
 		beanFactory.registerSingleton("springApplicationArguments", applicationArguments);
+
+		// 注册springBootBanner
 		if (printedBanner != null) {
 			beanFactory.registerSingleton("springBootBanner", printedBanner);
 		}
+
+		// 设置是否允许覆盖注册
 		if (beanFactory instanceof DefaultListableBeanFactory) {
 			((DefaultListableBeanFactory) beanFactory)
 					.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
+
+		//
 		if (this.lazyInitialization) {
 			context.addBeanFactoryPostProcessor(new LazyInitializationBeanFactoryPostProcessor());
 		}
+
+		// 获取全部配置源，其中包含primarySource和source
 		// Load the sources
 		Set<Object> sources = getAllSources();
 		Assert.notEmpty(sources, "Sources must not be empty");
+
+		// 将source中的Bean加载到context中
 		load(context, sources.toArray(new Object[0]));
+
+		// 通知监听器context加载完成
 		listeners.contextLoaded(context);
 	}
 
@@ -537,7 +593,9 @@ public class SpringApplication {
 			ConversionService conversionService = ApplicationConversionService.getSharedInstance();
 			environment.setConversionService((ConfigurableConversionService) conversionService);
 		}
+		// 配置PropertySources
 		configurePropertySources(environment, args);
+		// 配置Profiles
 		configureProfiles(environment, args);
 	}
 
