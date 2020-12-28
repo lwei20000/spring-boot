@@ -355,7 +355,7 @@ public class SpringApplication {
 			/**准备应用上下文**/
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
 
-			// refreshContext
+			/**刷新应用上下文**/
 			refreshContext(context);
 
 			// 初始化之后，默认空实现
@@ -504,14 +504,16 @@ public class SpringApplication {
 	private void refreshContext(ConfigurableApplicationContext context) {
 		if (this.registerShutdownHook) {
 			try {
+				// 注册shutdownHook线程，实现销毁时的回调
 				context.registerShutdownHook();
 			}
 			catch (AccessControlException ex) {
 				// Not allowed in some environments.
+				// 在某些环境中不允许使用，会报出一场，但此处并无处理操作
 			}
 		}
 
-		// refresh
+		// 调用refresh方法
 		refresh((ApplicationContext) context);
 	}
 
