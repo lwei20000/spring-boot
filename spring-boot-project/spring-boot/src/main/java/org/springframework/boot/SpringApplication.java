@@ -276,7 +276,11 @@ public class SpringApplication {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
+
+		// 资源加载的接口，包含banner（用的DefaultResourceLoader）
 		this.resourceLoader = resourceLoader;
+
+		// primarySources这个类必须是被注解@EnableAutoConfiguration修饰才可以开启Spring的自动配置
 		Assert.notNull(primarySources, "PrimarySources must not be null");
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
 
@@ -291,6 +295,7 @@ public class SpringApplication {
 		// 1.4节：监听器的注册（与系统初始化器类似）
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
 
+		// 推断main方法Class类
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
@@ -338,7 +343,7 @@ public class SpringApplication {
 
 			context.setApplicationStartup(this.applicationStartup);
 
-			/**调用系统初始化器的入口**/
+			/**调用【系统初始化器】的入口**/
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
 
 			// refreshContext
@@ -350,6 +355,8 @@ public class SpringApplication {
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), stopWatch);
 			}
 			listeners.started(context);
+
+			/**调用【启动加载器】的入口**/
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
@@ -405,6 +412,7 @@ public class SpringApplication {
 	private void prepareContext(DefaultBootstrapContext bootstrapContext, ConfigurableApplicationContext context,
 			ConfigurableEnvironment environment, SpringApplicationRunListeners listeners,
 			ApplicationArguments applicationArguments, Banner printedBanner) {
+
 		context.setEnvironment(environment);
 		postProcessApplicationContext(context);
 
@@ -673,7 +681,9 @@ public class SpringApplication {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void applyInitializers(ConfigurableApplicationContext context) {
+		//getInitializers()取得所有系统初始化器
 		for (ApplicationContextInitializer initializer : getInitializers()) {
+
 			Class<?> requiredType = GenericTypeResolver.resolveTypeArgument(initializer.getClass(), ApplicationContextInitializer.class);
 
 			// 判断是否是系统初始化器ApplicationContextInitializer的子类
@@ -825,9 +835,13 @@ public class SpringApplication {
 
 	private void callRunners(ApplicationContext context, ApplicationArguments args) {
 		List<Object> runners = new ArrayList<>();
+		// ApplicationRunner类型启动加载器
 		runners.addAll(context.getBeansOfType(ApplicationRunner.class).values());
+		// CommandLineRunner类型启动加载器
 		runners.addAll(context.getBeansOfType(CommandLineRunner.class).values());
+		// 排序
 		AnnotationAwareOrderComparator.sort(runners);
+		// 遍历调用run方法
 		for (Object runner : new LinkedHashSet<>(runners)) {
 			if (runner instanceof ApplicationRunner) {
 				callRunner((ApplicationRunner) runner, args);
