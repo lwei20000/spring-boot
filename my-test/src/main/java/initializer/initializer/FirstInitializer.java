@@ -22,7 +22,10 @@ public class FirstInitializer implements ApplicationContextInitializer<Configura
 	public void initialize(ConfigurableApplicationContext applicationContext) {
 		ConfigurableEnvironment environment =  applicationContext.getEnvironment();
 		Map<String, Object> map = new HashMap<>();
+
+		// 放入一些系统属性
 		map.put("key1", "value");
+
 		MapPropertySource mapPropertySource = new MapPropertySource("firstInitilizer1", map);
 		environment.getPropertySources().addLast(mapPropertySource);
 		System.out.println("=====================> run firstInitializer1");

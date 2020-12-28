@@ -10,7 +10,7 @@ import org.springframework.core.annotation.Order;
  * @Description:
  */
 @Order(1)
-public class FirstListener implements ApplicationListener {
+public class FirstListener implements ApplicationListener<ApplicationEvent> {
 	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
 		System.out.println("hello 1");

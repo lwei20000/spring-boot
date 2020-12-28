@@ -22,7 +22,10 @@ public class SecondInitializer implements ApplicationContextInitializer<Configur
 	public void initialize(ConfigurableApplicationContext applicationContext) {
 		ConfigurableEnvironment environment =  applicationContext.getEnvironment();
 		Map<String, Object> map = new HashMap<>();
-		map.put("key2", "value");
+
+		// 放入一些系统属性
+		map.put("key2", "value2");
+
 		MapPropertySource mapPropertySource = new MapPropertySource("firstInitilizer2", map);
 		environment.getPropertySources().addLast(mapPropertySource);
 		System.out.println("=====================> run firstInitializer2");

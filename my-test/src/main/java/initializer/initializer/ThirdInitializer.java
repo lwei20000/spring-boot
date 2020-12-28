@@ -22,7 +22,10 @@ public class ThirdInitializer implements ApplicationContextInitializer<Configura
 	public void initialize(ConfigurableApplicationContext applicationContext) {
 		ConfigurableEnvironment environment =  applicationContext.getEnvironment();
 		Map<String, Object> map = new HashMap<>();
-		map.put("key3", "value");
+
+		// 放入一些系统属性
+		map.put("key3", "value3");
+
 		MapPropertySource mapPropertySource = new MapPropertySource("firstInitilizer3", map);
 		environment.getPropertySources().addLast(mapPropertySource);
 		System.out.println("=====================> run firstInitializer3");

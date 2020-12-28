@@ -1,3 +1,4 @@
+// build.gradle中要放在文件头部
 buildscript {
 	repositories {
 		maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
