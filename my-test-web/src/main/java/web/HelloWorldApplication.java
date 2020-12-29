@@ -1,3 +1,5 @@
+package web;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 
 //import org.apache.log4j.Logger;
