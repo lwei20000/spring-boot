@@ -1,0 +1,5 @@
+# 系统初始化器
+org.springframework.context.ApplicationContextInitializer=initializer.initializer.FirstInitializer
+
+# 监听器
+org.springframework.context.ApplicationListener=event.event3.FirstListener,event.event3.ThirdListener

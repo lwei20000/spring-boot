@@ -89,4 +89,6 @@ file("${rootDir}/spring-boot-tests/spring-boot-smoke-tests").eachDirMatch(~/spri
 	include "spring-boot-tests:spring-boot-smoke-tests:${it.name}"
 }
 include 'my-test'
+include 'my-test-profile'
+include 'my-test-web'
 
