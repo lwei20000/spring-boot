@@ -93,10 +93,15 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 	@Override
 	public String[] selectImports(AnnotationMetadata annotationMetadata) {
+		// 检查自动配置功能是否为开启。默认为开启
 		if (!isEnabled(annotationMetadata)) {
 			return NO_IMPORTS;
 		}
+
+		// 封装将被引用的自动配置信息
 		AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(annotationMetadata);
+
+		// 返回符合条件的配置类的全限定名数组
 		return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());
 	}
 
@@ -116,16 +121,23 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 * @return the auto-configurations that should be imported
 	 */
 	protected AutoConfigurationEntry getAutoConfigurationEntry(AnnotationMetadata annotationMetadata) {
+
 		if (!isEnabled(annotationMetadata)) {
 			return EMPTY_ENTRY;
 		}
 		AnnotationAttributes attributes = getAttributes(annotationMetadata);
+
+		// 通过SpringFactoriesLoader加载类路径中META-INF目录下的spring.factories文件中针对EnableAutoConfiguration的注册配置类
 		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);
+		// 去重处理
 		configurations = removeDuplicates(configurations);
+		// 排除
 		Set<String> exclusions = getExclusions(annotationMetadata, attributes);
 		checkExcludedClasses(configurations, exclusions);
 		configurations.removeAll(exclusions);
+		// 检查配置类的注解是否符合spring.factories文件中AutoConfigurationImportFilter指定的注解检查条件
 		configurations = getConfigurationClassFilter().filter(configurations);
+		// 将筛选完成的配置类和排查类构建为事件类，并传入监听器。监听器的配置在于spring.factories文件中，通过AutoConfigurationImportListener指定。
 		fireAutoConfigurationImportEvents(configurations, exclusions);
 		return new AutoConfigurationEntry(configurations, exclusions);
 	}

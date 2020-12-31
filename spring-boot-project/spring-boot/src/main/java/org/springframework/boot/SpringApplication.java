@@ -454,7 +454,7 @@ public class SpringApplication {
 		// 在context刷新之前，ApplicationContextInitializer初始化context。（调用系统初始化器）
 		applyInitializers(context);
 
-		// ========通知监听器context准备好，该方法以上是文准备阶段，一下为上下是加载阶段。=========
+		// ========通知监听器context准备好，该方法以上是准备阶段，以下为上下是加载阶段。=========
 		listeners.contextPrepared(context);
 
 		//
