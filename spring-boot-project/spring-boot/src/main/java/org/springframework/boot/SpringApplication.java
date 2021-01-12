@@ -698,6 +698,7 @@ public class SpringApplication {
 	 * @see #setApplicationContextFactory(ApplicationContextFactory)
 	 */
 	protected ConfigurableApplicationContext createApplicationContext() {
+		// ------------------------------------------------------------------------------------------------
 		// private ApplicationContextFactory applicationContextFactory = ApplicationContextFactory.DEFAULT;
 		//      switch (webApplicationType) {
 		//			case SERVLET:
@@ -707,6 +708,7 @@ public class SpringApplication {
 		//			default:
 		//				return new AnnotationConfigApplicationContext();
 		//			}
+		// ------------------------------------------------------------------------------------------------
 		return this.applicationContextFactory.create(this.webApplicationType);
 	}
 
